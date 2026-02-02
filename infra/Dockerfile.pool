@@ -1,0 +1,54 @@
+# ------------------------------------------------------------------------------
+# STAGE 1: Build & Publish
+# ------------------------------------------------------------------------------
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# install dependencies required to build the Native RandomX libraries (C++)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cmake \
+    build-essential \
+    libssl-dev \
+    pkg-config \
+    libboost-all-dev \
+    libsodium-dev \
+    libzmq3-dev \
+    git
+
+# Clone MiningCore (Specific branch can be set here if needed, defaulting to master)
+# We clone instead of COPY to keep the docker context small and ensure clean state
+RUN git clone https://github.com/oliverw/miningcore.git .
+
+# Restore dependencies
+RUN dotnet restore
+
+# Build and Publish (Release mode)
+# This automagically compiles the native RandomX libs inside the container
+RUN dotnet publish -c Release --framework net8.0 -o /app/publish
+
+# ------------------------------------------------------------------------------
+# STAGE 2: Runtime
+# ------------------------------------------------------------------------------
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+# Install runtime dependencies for Monero/RandomX
+# libzmq5 is required for the ZMQ block notification to work
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libsodium23 \
+    libzmq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the compiled app from Stage 1
+COPY --from=build /app/publish .
+
+# Create a directory for configuration
+RUN mkdir -p /app/config
+
+# Expose the API port (standard MiningCore port)
+EXPOSE 4000
+# Expose Stratum ports (add more as needed for different difficulties)
+EXPOSE 3333 3334
+
+# Entry point
+ENTRYPOINT ["dotnet", "Miningcore.dll", "-c", "/app/config/config.json"]
