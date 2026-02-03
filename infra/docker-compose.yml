@@ -33,7 +33,7 @@ services:
       --rpc-bind-ip=0.0.0.0
       --rpc-bind-port=18081
       --confirm-external-bind
-      --non-interactive
+      --zmq-rpc-bind-port=18084
       --zmq-pub=tcp://0.0.0.0:18082 
       --out-peers=64
       --in-peers=32
