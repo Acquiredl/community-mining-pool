@@ -9,7 +9,7 @@
     "logBaseDirectory": "/app/logs"
   },
   "banning": {
-    "manager": "integrated",
+    "manager": "Integrated",
     "banOnJunkReceive": true,
     "banOnInvalidShares": true
   },
@@ -28,15 +28,31 @@
     "shareRecoveryFile": "recovered-shares.txt"
   },
   "clusterName": "Community XMR Pool",
-  "pools": [
+  "notifications": {
+    "enabled": false,
+    "email": {
+      "enabled": false,
+      "host": "smtp.example.com",
+      "port": 587,
+      "user": "user",
+      "password": "password",
+      "fromAddress": "pool@example.com"
+    },
+    "admin": {
+      "enabled": false,
+      "emailAddress": "admin@example.com",
+      "notifyBlockFound": true
+    }
+  },
+ "pools": [
     {
       "id": "xmr1",
       "enabled": true,
       "coin": "monero",
-      "address": "YOUR_MONERO_WALLET_ADDRESS_HERE",
+      "address": "43DQfAhWKaJAxgHPTbZvVEhzkidZQA2ciYQ4eqP9SygXbbpk7HzeyoV1kaPEMu6s83fhAQNYd7KhHAfkjziW2CgZN7VzMm1",
       "rewardRecipients": [
         {
-          "address": "YOUR_MONERO_WALLET_ADDRESS_HERE",
+          "address": "43DQfAhWKaJAxgHPTbZvVEhzkidZQA2ciYQ4eqP9SygXbbpk7HzeyoV1kaPEMu6s83fhAQNYd7KhHAfkjziW2CgZN7VzMm1",
           "percentage": 1.0
         }
       ],
@@ -69,6 +85,13 @@
           "user": "",
           "password": "",
           "zmqBlockNotifySocket": "tcp://monero-node:18082"
+        },
+        {
+          "host": "monero-wallet",
+          "port": 18083,
+          "user": "",
+          "password": "",
+          "category": "wallet"
         }
       ],
       "paymentProcessing": {
@@ -78,7 +101,7 @@
         "payoutSchemeConfig": {
           "factor": 2.0
         }
-      }
+      },
+      "randomXRealm": "xmr1"
     }
   ]
-}

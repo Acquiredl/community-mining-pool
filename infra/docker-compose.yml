@@ -62,9 +62,10 @@ services:
   # 5. Monero Wallet RPC (Handles Payments)
   # -------------------------------------------------------
   monero-wallet:
-    image: sethsimmons/simple-monerod:latest
+    # CHANGED: Use the dedicated wallet image (not the daemon image)
+    image: ghcr.io/sethforprivacy/simple-monero-wallet-rpc:latest 
     restart: unless-stopped
-    entrypoint: /usr/local/bin/monero-wallet-rpc
+    # command: We keep the same flags, but now the binary actually exists!
     command: >
       --daemon-address monero-node:18081
       --rpc-bind-port 18083

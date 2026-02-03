@@ -2,9 +2,9 @@
 # STAGE 1: Build & Publish
 # ------------------------------------------------------------------------------
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+WORKDIR /build
 
-# install dependencies required to build the Native RandomX libraries (C++)
+# Install dependencies required to build the Native RandomX libraries (C++)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake \
     build-essential \
@@ -15,15 +15,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libzmq3-dev \
     git
 
-# Clone MiningCore (Specific branch can be set here if needed, defaulting to master)
-# We clone instead of COPY to keep the docker context small and ensure clean state
-RUN git clone https://github.com/oliverw/miningcore.git .
+# Clone the repo into a known folder 'miningcore_src'
+RUN git clone https://github.com/oliverw/miningcore.git miningcore_src
 
-# Restore dependencies
+# Set working directory to the specific PROJECT folder
+WORKDIR /build/miningcore_src/src/Miningcore
+
+# ------------------------------------------------------------------------------
+# HOT-FIX: Upgrade Project to .NET 8.0 (Security Hardening)
+# The original code targets net6.0 (EOL). We force-upgrade it to net8.0 here.
+# ------------------------------------------------------------------------------
+RUN sed -i 's/net6.0/net8.0/g' Miningcore.csproj
+
+# Restore dependencies (Now it will see net8.0 because of the fix above)
 RUN dotnet restore
 
-# Build and Publish (Release mode)
-# This automagically compiles the native RandomX libs inside the container
+# Build and Publish (Release mode) - explicitly asking for net8.0
 RUN dotnet publish -c Release --framework net8.0 -o /app/publish
 
 # ------------------------------------------------------------------------------
@@ -33,7 +40,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
 # Install runtime dependencies for Monero/RandomX
-# libzmq5 is required for the ZMQ block notification to work
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libsodium23 \
     libzmq5 \
@@ -45,9 +51,8 @@ COPY --from=build /app/publish .
 # Create a directory for configuration
 RUN mkdir -p /app/config
 
-# Expose the API port (standard MiningCore port)
+# Expose ports
 EXPOSE 4000
-# Expose Stratum ports (add more as needed for different difficulties)
 EXPOSE 3333 3334
 
 # Entry point
