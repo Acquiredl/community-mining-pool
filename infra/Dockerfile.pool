@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
-# STAGE 1: Build & Publish
+# STAGE 1: Build & Publish (Using .NET 6 SDK)
 # ------------------------------------------------------------------------------
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /build
 
 # Install dependencies required to build the Native RandomX libraries (C++)
@@ -15,33 +15,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libzmq3-dev \
     git
 
-# Clone the repo into a known folder 'miningcore_src'
+# Clone the repo
 RUN git clone https://github.com/oliverw/miningcore.git miningcore_src
 
 # Set working directory to the specific PROJECT folder
 WORKDIR /build/miningcore_src/src/Miningcore
 
-# ------------------------------------------------------------------------------
-# HOT-FIX: Upgrade Project to .NET 8.0 (Security Hardening)
-# The original code targets net6.0 (EOL). We force-upgrade it to net8.0 here.
-# ------------------------------------------------------------------------------
-RUN sed -i 's/net6.0/net8.0/g' Miningcore.csproj
-
-# Restore dependencies (Now it will see net8.0 because of the fix above)
+# Restore dependencies
 RUN dotnet restore
 
-# Build and Publish (Release mode) - explicitly asking for net8.0
-RUN dotnet publish -c Release --framework net8.0 -o /app/publish
+# Build and Publish (Release mode)
+# Note: We removed the '--framework net8.0' flag so it builds naturally
+RUN dotnet publish -c Release -o /app/publish
 
 # ------------------------------------------------------------------------------
-# STAGE 2: Runtime
+# STAGE 2: Runtime (Using .NET 6 Runtime)
 # ------------------------------------------------------------------------------
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
 WORKDIR /app
 
 # Install runtime dependencies for Monero/RandomX
+# We install 'libsodium23' if available, or fallback to standard libs
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libsodium23 \
+    libsodium-dev \
     libzmq5 \
     && rm -rf /var/lib/apt/lists/*
 

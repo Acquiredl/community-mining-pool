@@ -44,7 +44,7 @@
       "notifyBlockFound": true
     }
   },
- "pools": [
+  "pools": [
     {
       "id": "xmr1",
       "enabled": true,
@@ -105,3 +105,4 @@
       "randomXRealm": "xmr1"
     }
   ]
+}
