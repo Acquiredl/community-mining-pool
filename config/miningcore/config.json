@@ -94,7 +94,9 @@
           "port": 18081,
           "user": "",
           "password": "",
-          "zmqBlockNotifySocket": "tcp://monero-node:18082"
+          "zmqBlockNotifySocket": "tcp://monero-node:18082",
+          "extra":{"ignoreStatus": true
+        }
         },
         {
           "host": "monero-wallet",
