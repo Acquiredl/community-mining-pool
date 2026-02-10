@@ -89,26 +89,22 @@
         }
       },
       "daemons": [
-  {
-    "host": "monero-node",
-    "port": 18081,
-    "user": null,
-    "password": null,
-    "extra": {
-      "enableRequestLogging": false
-    }
-  },
-  {
-    "host": "monero-wallet",
-    "port": 18083,
-    "user": null,
-    "password": null,
-    "category": "wallet",
-    "extra": {
-      "accountIndex": 0,
-      "enableRequestLogging": false
-    }
-  }
+        {
+          "host": "monero-node",
+          "port": 18081,
+          "user": null,
+          "password": null,
+          "extra": {
+            "enableRequestLogging": false
+          }
+        },
+        {
+          "host": "monero-wallet",
+          "port": 18083,
+          "category": "wallet",
+          "user": "",
+          "password": ""
+        }
       ],
       "paymentProcessing": {
         "enabled": true,
@@ -119,6 +115,56 @@
         }
       },
       "randomXRealm": "xmr1"
+    },
+    {
+      "id": "rvn1",
+      "enabled": true,
+      "coin": "ravencoin",
+      "address": "RXFz4qUWEeXsg35rTeLB919AkCPJczSaNN",
+      "rewardRecipients": [
+        {
+          "address": "RXFz4qUWEeXsg35rTeLB919AkCPJczSaNN",
+          "percentage": 1.0
+        }
+      ],
+      "blockRefreshInterval": 1000,
+      "clientConnectionTimeout": 600,
+      "banning": {
+        "enabled": true,
+        "time": 600,
+        "invalidPercent": 50,
+        "checkThreshold": 50
+      },
+      "ports": {
+        "4444": {
+          "listenAddress": "0.0.0.0",
+          "name": "Ravencoin Mining",
+          "difficulty": 32,
+          "varDiff": {
+            "minDiff": 8,
+            "maxDiff": 512,
+            "targetTime": 15,
+            "retargetTime": 90,
+            "variancePercent": 30
+          }
+        }
+      },
+      "daemons": [
+        {
+          "host": "ravencoin-node",
+          "port": 8766,
+          "user": "user",
+          "password": "password"
+        }
+      ],
+      "paymentProcessing": {
+        "enabled": true,
+        "minimumPayment": 10,
+        "payoutScheme": "PPLNS",
+        "payoutSchemeConfig": {
+          "factor": 2.0
+        }
+      }
     }
   ]
 }
