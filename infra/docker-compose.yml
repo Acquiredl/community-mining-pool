@@ -23,7 +23,7 @@ services:
   # 2. Monero Node (The Blockchain)
   # -------------------------------------------------------
   monero-node:
-    image: sethsimmons/simple-monerod:latest
+    image: ghcr.io/sethforprivacy/simple-monerod:latest
     restart: unless-stopped
     volumes:
       - monero-data:/home/monero/.bitmonero
@@ -36,7 +36,7 @@ services:
       --rpc-bind-ip=0.0.0.0
       --rpc-bind-port=18081
       --confirm-external-bind
-      --zmq-pub=tcp://0.0.0.0:18082 
+      --no-zmq
       --out-peers=64
       --in-peers=32
 
