@@ -1,1 +1,14 @@
+# --- Blockchains & Data (NEVER UPLOAD) ---
+infra/monero-data/
+infra/ravencoin-data/
+infra/postgres-data/
+
+# --- Wallets & Security (CRITICAL) ---
 infra/wallet/
+*.keys
+*.address
+*.log
+
+# --- System Files ---
+.DS_Store
+Thumbs.db
