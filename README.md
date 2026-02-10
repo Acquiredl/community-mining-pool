@@ -39,5 +39,5 @@ The stack runs entirely on **Docker Compose**, orchestrating the following micro
 
 **1. Clone the Repository**
 ```bash
-git clone [https://github.com/YourUsername/mining-pool-stack.git](https://github.com/YourUsername/mining-pool-stack.git)
+git clone [https://github.com/Acquiredl/community-mining-poolt](https://github.com/Acquiredl/community-mining-pool)
 cd mining-pool-stack
