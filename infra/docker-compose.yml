@@ -17,6 +17,7 @@ services:
       - postgres
       - redis
       - monero-node
+      - monero-wallet
 
   # -------------------------------------------------------
   # 2. Monero Node (The Blockchain)
@@ -29,11 +30,12 @@ services:
     ports:
       - "18080:18080" # P2P (External)
       # 18081 is RPC, we keep it internal for security
+      - "18081:18081"
+      - "18082:18082"
     command: >
       --rpc-bind-ip=0.0.0.0
       --rpc-bind-port=18081
       --confirm-external-bind
-      --zmq-rpc-bind-port=18084
       --zmq-pub=tcp://0.0.0.0:18082 
       --out-peers=64
       --in-peers=32
@@ -51,7 +53,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
-  # -------------------------------------------------------
+# -------------------------------------------------------
   # 4. Cache (Redis)
   # -------------------------------------------------------
   redis:

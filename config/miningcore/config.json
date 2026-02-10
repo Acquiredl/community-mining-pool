@@ -89,22 +89,26 @@
         }
       },
       "daemons": [
-        {
-          "host": "monero-node",
-          "port": 18081,
-          "user": "",
-          "password": "",
-          "zmqBlockNotifySocket": "tcp://monero-node:18082",
-          "extra":{"ignoreStatus": true
-        }
-        },
-        {
-          "host": "monero-wallet",
-          "port": 18083,
-          "user": "",
-          "password": "",
-          "category": "wallet"
-        }
+  {
+    "host": "monero-node",
+    "port": 18081,
+    "user": null,
+    "password": null,
+    "extra": {
+      "enableRequestLogging": false
+    }
+  },
+  {
+    "host": "monero-wallet",
+    "port": 18083,
+    "user": null,
+    "password": null,
+    "category": "wallet",
+    "extra": {
+      "accountIndex": 0,
+      "enableRequestLogging": false
+    }
+  }
       ],
       "paymentProcessing": {
         "enabled": true,
