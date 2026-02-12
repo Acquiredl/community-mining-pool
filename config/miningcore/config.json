@@ -27,7 +27,7 @@
     "interval": 600,
     "shareRecoveryFile": "recovered-shares.txt"
   },
-  "clusterName": "Community XMR Pool",
+  "clusterName": "Community XMR+ERG Pool",
   "api": {
     "enabled": true,
     "listenAddress": "0.0.0.0",
@@ -117,17 +117,18 @@
       "randomXRealm": "xmr1"
     },
     {
-      "id": "rvn1",
+      "id": "ergo1",
       "enabled": true,
-      "coin": "ravencoin",
-      "address": "RXFz4qUWEeXsg35rTeLB919AkCPJczSaNN",
+      "coin": "ergo",
+      "address": "9gd7ENv9YeSs19mKGN8Dq5hTcM89Lht7gXzSSn1JMWH98WymsLJ",
       "rewardRecipients": [
         {
-          "address": "RXFz4qUWEeXsg35rTeLB919AkCPJczSaNN",
+          "address": "9gd7ENv9YeSs19mKGN8Dq5hTcM89Lht7gXzSSn1JMWH98WymsLJ",
           "percentage": 1.0
         }
       ],
-      "blockRefreshInterval": 1000,
+      "blockRefreshInterval": 400,
+      "jobRebroadcastTimeout": 10,
       "clientConnectionTimeout": 600,
       "banning": {
         "enabled": true,
@@ -136,30 +137,46 @@
         "checkThreshold": 50
       },
       "ports": {
-        "4444": {
+        "3052": {
           "listenAddress": "0.0.0.0",
-          "name": "Ravencoin Mining",
-          "difficulty": 32,
+          "name": "Ergo Low Diff (GPU)",
+          "difficulty": 0.02,
+          "tls": false,
           "varDiff": {
-            "minDiff": 8,
-            "maxDiff": 512,
+            "minDiff": 0.01,
+            "maxDiff": null,
             "targetTime": 15,
             "retargetTime": 90,
-            "variancePercent": 30
+            "variancePercent": 30,
+            "maxDelta": 500
+          }
+        },
+        "3152": {
+          "listenAddress": "0.0.0.0",
+          "name": "Ergo High Diff (GPU Farm)",
+          "difficulty": 1.0,
+          "tls": false,
+          "varDiff": {
+            "minDiff": 0.5,
+            "maxDiff": null,
+            "targetTime": 15,
+            "retargetTime": 90,
+            "variancePercent": 30,
+            "maxDelta": 500
           }
         }
       },
       "daemons": [
         {
-          "host": "ravencoin-node",
-          "port": 8766,
-          "user": "user",
-          "password": "password"
+          "host": "ergo-node",
+          "port": 9053,
+          "user": "",
+          "password": ""
         }
       ],
       "paymentProcessing": {
-        "enabled": true,
-        "minimumPayment": 10,
+        "enabled": false,
+        "minimumPayment": 0.5,
         "payoutScheme": "PPLNS",
         "payoutSchemeConfig": {
           "factor": 2.0
