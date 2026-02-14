@@ -16,16 +16,11 @@ services:
     volumes:
       - ../config/miningcore:/app/config
     depends_on:
-      postgres:
-        condition: service_started
-      redis:
-        condition: service_started
-      monero-node:
-        condition: service_healthy
-      monero-wallet:
-        condition: service_started
-      ergo-node:
-        condition: service_healthy
+      - postgres
+      - redis
+      - monero-node
+      - monero-wallet
+      - ergo-node
 
   # -------------------------------------------------------
   # 2. Monero Node (The Blockchain)
@@ -46,12 +41,6 @@ services:
       --no-zmq
       --out-peers=64
       --in-peers=32
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:18081/json_rpc -d '{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"get_info\"}' -H 'Content-Type: application/json' || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 60s
 
   # -------------------------------------------------------
   # 3. Database (PostgreSQL)
@@ -115,7 +104,7 @@ services:
       - ./ergo.conf:/etc/ergo.conf:ro
     ports:
       - "9030:9030"     # P2P — blockchain sync with peers
-      # 9053 NOT exposed — MiningCore connects internally via Docker DNSdocke
+      # 9053 NOT exposed — MiningCore connects internally via Docker DNS
     environment:
       - MAX_HEAP=4G
     restart: unless-stopped
@@ -130,6 +119,55 @@ services:
       timeout: 10s
       retries: 10
       start_period: 120s
+
+  # -------------------------------------------------------
+  # 7. Frontend Dashboard (Nuxt 3) — PHASE 4A NEW
+  # -------------------------------------------------------
+  # This is the web UI that miners visit to check their stats.
+  # It consumes the MiningCore REST API on port 4000.
+  frontend:
+    build:
+      context: ../frontend           # Points to the frontend/ directory at repo root
+      dockerfile: Dockerfile
+    image: community-pool/frontend:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"                  # Nuxt dev/production server
+    environment:
+      # NUXT_PUBLIC_API_URL — tells the frontend where MiningCore's API lives.
+      # Inside Docker, services find each other by service name (not localhost).
+      # "miningcore" here matches the service name above.
+      - NUXT_PUBLIC_API_URL=/api
+
+      # NUXT_PUBLIC_POOL_NAME — displayed in the navbar and page titles.
+      # ${POOL_NAME} reads from your .env file. Falls back to default if not set.
+      - NUXT_PUBLIC_POOL_NAME=${POOL_NAME:-Community Mining Pool}
+    depends_on:
+      - miningcore                   # Don't start frontend until pool engine is up
+
+  # -------------------------------------------------------
+  # 8. Reverse Proxy (Nginx) — PHASE 4A NEW
+  # -------------------------------------------------------
+  # Routes incoming web traffic:
+  #   http://your-server/api/*  → MiningCore API (port 4000)
+  #   http://your-server/*      → Nuxt Frontend (port 3000)
+  #
+  # In Phase 5, this will also handle SSL/TLS (HTTPS).
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"                      # HTTP — the port visitors hit in their browser
+      # Uncomment in Phase 5 when you add SSL certificates:
+      # - "443:443"
+    volumes:
+      # Mount your nginx config (read-only for security)
+      - ../config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # Uncomment in Phase 5 for SSL:
+      # - ../config/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend                     # Nginx needs both backend services running
+      - miningcore
 
 volumes:
   monero-data:

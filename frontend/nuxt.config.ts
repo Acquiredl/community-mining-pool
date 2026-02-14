@@ -1,0 +1,74 @@
+// ============================================================
+// NUXT CONFIGURATION
+// This is the "brain" of the frontend app.
+// It tells Nuxt which plugins to load, how to handle CSS,
+// and where to find the MiningCore API.
+// ============================================================
+
+export default defineNuxtConfig({
+  // --- Modules ---
+  // These are Nuxt plugins that add functionality automatically.
+  // You don't need to configure them beyond listing them here.
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/google-fonts',
+  ],
+
+  // --- Google Fonts ---
+  // Loaded automatically in <head>. Change these in Phase 4B
+  // when the theming system reads from pool.config.yml.
+  googleFonts: {
+    families: {
+      'Space Grotesk': [400, 500, 600, 700],
+      'Inter': [300, 400, 500, 600],
+    },
+    display: 'swap', // Prevents invisible text while fonts load
+  },
+
+  // --- Runtime Config ---
+  // These values are available in your Vue components via useRuntimeConfig().
+  // They can be overridden by environment variables (NUXT_PUBLIC_*).
+  runtimeConfig: {
+    public: {
+      // MiningCore API base URL — overridden by NUXT_PUBLIC_API_URL env var
+      apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:4000/api',
+
+      // Pool display name — overridden by NUXT_PUBLIC_POOL_NAME env var
+      poolName: process.env.NUXT_PUBLIC_POOL_NAME || 'Community Mining Pool',
+    },
+  },
+
+  // --- App Head ---
+  // Default <head> tags for all pages. Title is overridden per-page.
+  app: {
+    head: {
+      title: 'Community Mining Pool',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'Community-powered cryptocurrency mining pool' },
+      ],
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/assets/favicon.ico' },
+      ],
+    },
+  },
+
+  // --- SSR ---
+  // Server-side rendering is ON by default in Nuxt 3.
+  // This means pages load fast and are SEO-friendly.
+  ssr: true,
+
+  // --- TypeScript ---
+  typescript: {
+    strict: true,
+  },
+
+  // --- Dev Server ---
+  devServer: {
+    port: 3000,
+  },
+
+  // --- Compatibility ---
+  compatibilityDate: '2025-01-01',
+})
