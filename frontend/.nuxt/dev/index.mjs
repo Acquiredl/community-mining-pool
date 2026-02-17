@@ -5,6 +5,8 @@ import nodeCrypto from 'node:crypto';
 import { parentPort, threadId } from 'node:worker_threads';
 import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, createError, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, getResponseStatusText } from 'file://C:/Users/steph/Documents/GitHub/community-mining-pool/frontend/node_modules/h3/dist/index.mjs';
 import { escapeHtml } from 'file://C:/Users/steph/Documents/GitHub/community-mining-pool/frontend/node_modules/@vue/shared/dist/shared.cjs.js';
+import { existsSync, readFileSync, promises } from 'node:fs';
+import yaml from 'file://C:/Users/steph/Documents/GitHub/community-mining-pool/frontend/node_modules/js-yaml/dist/js-yaml.mjs';
 import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'file://C:/Users/steph/Documents/GitHub/community-mining-pool/frontend/node_modules/vue-bundle-renderer/dist/runtime.mjs';
 import { parseURL, withoutBase, joinURL, getQuery, withQuery, withTrailingSlash, decodePath, withLeadingSlash, withoutTrailingSlash, joinRelativeURL } from 'file://C:/Users/steph/Documents/GitHub/community-mining-pool/frontend/node_modules/ufo/dist/index.mjs';
 import { renderToString } from 'file://C:/Users/steph/Documents/GitHub/community-mining-pool/frontend/node_modules/vue/server-renderer/index.mjs';
@@ -31,7 +33,6 @@ import { SourceMapConsumer } from 'file://C:/Users/steph/Documents/GitHub/commun
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { getContext } from 'file://C:/Users/steph/Documents/GitHub/community-mining-pool/frontend/node_modules/unctx/dist/index.mjs';
 import { captureRawStackTrace, parseRawStackTrace } from 'file://C:/Users/steph/Documents/GitHub/community-mining-pool/frontend/node_modules/errx/dist/index.js';
-import { promises } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname as dirname$1, resolve as resolve$1 } from 'file://C:/Users/steph/Documents/GitHub/community-mining-pool/frontend/node_modules/pathe/dist/index.mjs';
 import { walkResolver } from 'file://C:/Users/steph/Documents/GitHub/community-mining-pool/frontend/node_modules/unhead/dist/utils.mjs';
@@ -647,7 +648,10 @@ const _inlineRuntimeConfig = {
       }
     }
   },
-  "public": {}
+  "public": {
+    "apiUrl": "http://localhost:4000/api",
+    "poolName": "Community Mining Pool"
+  }
 };
 const envOptions = {
   prefix: "NITRO_",
@@ -2028,7 +2032,7 @@ const _Wce_k3Za6L_slMU7G18aGMOT3bRcvGwLiiasqk_a_V0 = (function(nitro) {
 
 const rootDir = "C:/Users/steph/Documents/GitHub/community-mining-pool/frontend";
 
-const appHead = {"meta":[{"name":"viewport","content":"width=device-width, initial-scale=1"},{"charset":"utf-8"}],"link":[],"style":[],"script":[],"noscript":[]};
+const appHead = {"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"name":"description","content":"Community-powered cryptocurrency mining pool"}],"link":[{"rel":"icon","type":"image/x-icon","href":"/assets/favicon.ico"}],"style":[],"script":[],"noscript":[],"title":"Community Mining Pool"};
 
 const appRootTag = "div";
 
@@ -2124,9 +2128,114 @@ function onConsoleLog(callback) {
 	consola$1.wrapConsole();
 }
 
+function defineNitroPlugin(def) {
+  return def;
+}
+
+const DEFAULT_CONFIG$1 = {
+  pool: {
+    name: "Community Mining Pool",
+    tagline: "Mining for the community",
+    logo: "/assets/logo.png",
+    favicon: "/assets/favicon.ico",
+    footer_text: "Powered by MiningCore"
+  },
+  coins: {},
+  theme: {
+    mode: "dark",
+    primary_color: "#8B5CF6",
+    secondary_color: "#06B6D4",
+    background: "#0B0B14",
+    card_background: "#12121F",
+    text_color: "#E2E8F0",
+    text_dim_color: "#64748B",
+    border_color: "#1E293B",
+    success_color: "#22C55E",
+    warning_color: "#F59E0B",
+    danger_color: "#EF4444",
+    font_heading: "Space Grotesk",
+    font_body: "Inter",
+    border_radius: "12px",
+    glow_effects: true,
+    glow_color: "#8B5CF680"
+  },
+  pages: {
+    home: true,
+    miners: true,
+    blocks: true,
+    payments: true,
+    getting_started: true,
+    goals: false,
+    leaderboard: false
+  },
+  connection: {
+    domain: "pool.example.com",
+    stratum_port_cpu: 3333,
+    stratum_port_gpu: 3052,
+    stratum_port_gpu_high: 3152,
+    region: "US-East",
+    ssl_enabled: false
+  },
+  goals: { enabled: false, items: [] },
+  celebrations: { enabled: false, style: "none", sound: false, show_finder: true },
+  discord: { enabled: false }
+};
+function deepMerge$1(target, source) {
+  const output = { ...target };
+  for (const key of Object.keys(source)) {
+    if (source[key] && typeof source[key] === "object" && !Array.isArray(source[key]) && target[key] && typeof target[key] === "object" && !Array.isArray(target[key])) {
+      output[key] = deepMerge$1(target[key], source[key]);
+    } else {
+      output[key] = source[key];
+    }
+  }
+  return output;
+}
+const _hJkbxIxDOttUTigW1PcSWMs2xULh_T1IcEpQ8Y33C9k = defineNitroPlugin((nitroApp) => {
+  const configPaths = [
+    "/app/config/pool.config.yml",
+    // Docker mount path
+    resolve(process.cwd(), "../config/pool-theme/pool.config.yml"),
+    // Local dev
+    resolve(process.cwd(), "config/pool.config.yml")
+    // Alt local path
+  ];
+  let rawYaml = null;
+  let loadedFrom = "defaults";
+  for (const configPath of configPaths) {
+    if (existsSync(configPath)) {
+      try {
+        rawYaml = readFileSync(configPath, "utf-8");
+        loadedFrom = configPath;
+        break;
+      } catch (err) {
+        console.warn(`[pool-config] Could not read ${configPath}:`, err);
+      }
+    }
+  }
+  let userConfig = {};
+  if (rawYaml) {
+    try {
+      userConfig = yaml.load(rawYaml) || {};
+      console.log(`[pool-config] \u2713 Loaded config from: ${loadedFrom}`);
+    } catch (err) {
+      console.error("[pool-config] \u2717 YAML parse error \u2014 using defaults:", err);
+      userConfig = {};
+    }
+  } else {
+    console.warn("[pool-config] \u26A0 No pool.config.yml found \u2014 using defaults");
+  }
+  const finalConfig = deepMerge$1(DEFAULT_CONFIG$1, userConfig);
+  nitroApp.poolConfig = finalConfig;
+  console.log(`[pool-config] \u2713 Pool name: "${finalConfig.pool.name}"`);
+  console.log(`[pool-config] \u2713 Theme mode: ${finalConfig.theme.mode}`);
+  console.log(`[pool-config] \u2713 Coins configured: ${Object.keys(finalConfig.coins).join(", ") || "none"}`);
+});
+
 const plugins = [
   _Wce_k3Za6L_slMU7G18aGMOT3bRcvGwLiiasqk_a_V0,
-_Kerf6rFAfe8zieLJigpptVgmr9HNkB1u0PKZ3xbPRA
+_Kerf6rFAfe8zieLJigpptVgmr9HNkB1u0PKZ3xbPRA,
+_hJkbxIxDOttUTigW1PcSWMs2xULh_T1IcEpQ8Y33C9k
 ];
 
 const assets = {};
@@ -2578,10 +2687,12 @@ async function getIslandContext(event) {
 	return ctx;
 }
 
+const _lazy_lufkPy = () => Promise.resolve().then(function () { return poolConfig_get$1; });
 const _lazy_rNBWmC = () => Promise.resolve().then(function () { return renderer$1; });
 
 const handlers = [
   { route: '', handler: _GQPhW9, lazy: false, middleware: true, method: undefined },
+  { route: '/api/pool-config', handler: _lazy_lufkPy, lazy: true, middleware: false, method: "get" },
   { route: '/__nuxt_error', handler: _lazy_rNBWmC, lazy: true, middleware: false, method: undefined },
   { route: '/__nuxt_island/**', handler: _SxA8c9, lazy: false, middleware: false, method: undefined },
   { route: '/**', handler: _lazy_rNBWmC, lazy: true, middleware: false, method: undefined }
@@ -2922,6 +3033,111 @@ const styles = {};
 const styles$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
   default: styles
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const DEFAULT_CONFIG = {
+  pool: {
+    name: "Community Mining Pool",
+    tagline: "Mining for the community",
+    logo: "/assets/logo.png",
+    favicon: "/assets/favicon.ico",
+    footer_text: "Powered by MiningCore"
+  },
+  coins: {},
+  theme: {
+    mode: "dark",
+    primary_color: "#8B5CF6",
+    secondary_color: "#06B6D4",
+    background: "#0B0B14",
+    card_background: "#12121F",
+    text_color: "#E2E8F0",
+    text_dim_color: "#64748B",
+    border_color: "#1E293B",
+    success_color: "#22C55E",
+    warning_color: "#F59E0B",
+    danger_color: "#EF4444",
+    font_heading: "Space Grotesk",
+    font_body: "Inter",
+    border_radius: "12px",
+    glow_effects: true,
+    glow_color: "#8B5CF680"
+  },
+  pages: {
+    home: true,
+    miners: true,
+    blocks: true,
+    payments: true,
+    getting_started: true,
+    goals: false,
+    leaderboard: false
+  },
+  connection: {
+    domain: "pool.example.com",
+    stratum_port_cpu: 3333,
+    stratum_port_gpu: 3052,
+    stratum_port_gpu_high: 3152,
+    region: "US-East",
+    ssl_enabled: false
+  },
+  goals: { enabled: false, items: [] },
+  celebrations: { enabled: false, style: "none", sound: false, show_finder: true },
+  discord: { enabled: false }
+};
+function deepMerge(target, source) {
+  const output = { ...target };
+  for (const key of Object.keys(source)) {
+    if (source[key] && typeof source[key] === "object" && !Array.isArray(source[key]) && target[key] && typeof target[key] === "object" && !Array.isArray(target[key])) {
+      output[key] = deepMerge(target[key], source[key]);
+    } else {
+      output[key] = source[key];
+    }
+  }
+  return output;
+}
+const poolConfig_get = defineNitroPlugin((nitroApp) => {
+  const configPaths = [
+    "/app/config/pool.config.yml",
+    // Docker mount path
+    resolve(process.cwd(), "../config/pool-theme/pool.config.yml"),
+    // Local dev
+    resolve(process.cwd(), "config/pool.config.yml")
+    // Alt local path
+  ];
+  let rawYaml = null;
+  let loadedFrom = "defaults";
+  for (const configPath of configPaths) {
+    if (existsSync(configPath)) {
+      try {
+        rawYaml = readFileSync(configPath, "utf-8");
+        loadedFrom = configPath;
+        break;
+      } catch (err) {
+        console.warn(`[pool-config] Could not read ${configPath}:`, err);
+      }
+    }
+  }
+  let userConfig = {};
+  if (rawYaml) {
+    try {
+      userConfig = yaml.load(rawYaml) || {};
+      console.log(`[pool-config] \u2713 Loaded config from: ${loadedFrom}`);
+    } catch (err) {
+      console.error("[pool-config] \u2717 YAML parse error \u2014 using defaults:", err);
+      userConfig = {};
+    }
+  } else {
+    console.warn("[pool-config] \u26A0 No pool.config.yml found \u2014 using defaults");
+  }
+  const finalConfig = deepMerge(DEFAULT_CONFIG, userConfig);
+  nitroApp.poolConfig = finalConfig;
+  console.log(`[pool-config] \u2713 Pool name: "${finalConfig.pool.name}"`);
+  console.log(`[pool-config] \u2713 Theme mode: ${finalConfig.theme.mode}`);
+  console.log(`[pool-config] \u2713 Coins configured: ${Object.keys(finalConfig.coins).join(", ") || "none"}`);
+});
+
+const poolConfig_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: poolConfig_get
 }, Symbol.toStringTag, { value: 'Module' }));
 
 function renderPayloadResponse(ssrContext) {

@@ -1,12 +1,13 @@
 <!--
-  APP.VUE — The root component of the entire frontend.
+  APP.VUE — Root component
   
-  This file does two things:
-  1. Sets CSS custom properties (variables) for the pool theme colors
-  2. Renders the current page inside <NuxtLayout>
+  CSS custom properties are set here as DEFAULTS for the server-side render.
+  When the app hydrates in the browser, the theme.client.ts plugin calls
+  usePoolConfig(), which overrides these with values from pool.config.yml.
 
-  In Phase 4B, these CSS variables will be injected dynamically
-  from pool.config.yml. For now, they're hardcoded to a dark theme.
+  This two-step approach means:
+  1. SSR always renders with sensible defaults (no blank page)
+  2. Client hydration applies the community's custom theme instantly
 -->
 
 <template>
@@ -17,17 +18,18 @@
 
 <style>
 /* ============================================================
-   POOL THEME — CSS Custom Properties
+   POOL THEME — CSS Custom Properties (SSR Defaults)
    
-   Every component uses these variables via Tailwind classes like:
-     bg-pool-bg, text-pool-primary, border-pool-border, etc.
-   
-   To change the entire look of the pool, you only need to
-   change these values. Phase 4B automates this from YAML.
+   These are overridden at runtime by usePoolConfig() when the
+   browser loads pool.config.yml values. They exist here so the
+   server-rendered HTML has valid colors on first paint.
+
+   Tailwind classes like bg-pool-bg and text-pool-primary
+   reference these variables via tailwind.config.ts.
    ============================================================ */
 
 :root {
-  /* --- Core Colors --- */
+  /* --- Core Colors (overridden from theme section of pool.config.yml) --- */
   --pool-bg: #0B0B14;
   --pool-card: #12121F;
   --pool-text: #E2E8F0;
@@ -41,9 +43,19 @@
   --pool-warning: #F59E0B;
   --pool-danger: #EF4444;
 
-  /* --- Coin Brand Colors --- */
-  --pool-xmr: #FF6600;
-  --pool-ergo: #00B2FF;
+  /* --- Shape --- */
+  --pool-radius: 12px;
+
+  /* --- Glow Effect --- */
+  --pool-glow: #8B5CF680;
+
+  /* --- Typography --- */
+  --pool-font-heading: 'Space Grotesk', sans-serif;
+  --pool-font-body: 'Inter', sans-serif;
+
+  /* --- Coin Colors (defaults, overridden per-coin from config) --- */
+  --pool-coin-monero1: #FF6600;
+  --pool-coin-ergo1: #00B2FF;
 }
 
 /* --- Global Resets --- */
@@ -56,7 +68,7 @@
 }
 
 html {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--pool-font-body);
   color: var(--pool-text);
   background-color: var(--pool-bg);
 }
@@ -65,6 +77,25 @@ body {
   min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+/* --- Heading Font --- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--pool-font-heading);
+}
+
+/* --- Glow Utility Class --- */
+.pool-glow {
+  box-shadow: 0 0 20px var(--pool-glow), 0 0 60px var(--pool-glow);
+}
+
+.pool-glow-sm {
+  box-shadow: 0 0 10px var(--pool-glow);
+}
+
+/* --- Border Radius Utility --- */
+.pool-rounded {
+  border-radius: var(--pool-radius);
 }
 
 /* --- Scrollbar Styling (Webkit) --- */
@@ -80,5 +111,16 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--pool-text-dim);
+}
+
+/* --- Light Mode Override --- */
+/* When pool.config.yml sets mode: "light", the composable adds this class */
+html.light-mode {
+  --pool-bg: #F8FAFC;
+  --pool-card: #FFFFFF;
+  --pool-text: #1E293B;
+  --pool-text-dim: #64748B;
+  --pool-border: #E2E8F0;
+  --pool-glow: transparent;
 }
 </style>

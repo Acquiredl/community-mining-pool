@@ -1,0 +1,138 @@
+# =============================================
+# COMMUNITY POOL CONFIGURATION
+# =============================================
+#
+# This is the ONLY file you need to edit to customize your pool.
+# Change values below, then run: docker compose up --build
+# Your pool will rebuild with your branding, colors, and settings.
+#
+# Lines starting with # are comments — they're ignored.
+# Don't remove the keys (the words before the colons).
+# =============================================
+
+
+# ----- Pool Identity -----
+# These values appear in the browser tab, navigation bar, and homepage.
+pool:
+  name: "Pixel Pickaxe Pool"             # Your pool's display name
+  tagline: "Mining for the community"     # Shown below the name on the homepage
+  logo: "/assets/logo.png"                # Place your logo in frontend/public/assets/
+  favicon: "/assets/favicon.ico"          # Browser tab icon
+  footer_text: "Powered by MiningCore"    # Footer attribution (change or remove)
+
+
+# ----- Coins -----
+# Display settings for each coin your pool mines.
+# The pool IDs (ergo1, monero1) must match your MiningCore config.json.
+coins:
+  monero1:
+    display_name: "Monero"
+    ticker: "XMR"
+    icon: "cpu"                           # Lucide icon name (cpu, gpu, coins, etc.)
+    color: "#FF6600"                      # Brand color for charts and badges
+    explorer_url: "https://xmrchain.net"  # Block explorer base URL
+    algo: "RandomX"
+  ergo1:
+    display_name: "Ergo"
+    ticker: "ERG"
+    icon: "gpu"
+    color: "#00B2FF"
+    explorer_url: "https://explorer.ergoplatform.com"
+    algo: "Autolykos v2"
+
+
+# ----- Theme -----
+# Controls the entire visual appearance of your pool dashboard.
+# All colors are hex codes. Google Font names are loaded automatically.
+theme:
+  mode: "dark"                            # "dark" or "light"
+
+  # Colors
+  primary_color: "#8B5CF6"                # Main accent — buttons, links, active states
+  secondary_color: "#06B6D4"              # Secondary accent — hover states, badges
+  background: "#0B0B14"                   # Page background
+  card_background: "#12121F"              # Card/panel surfaces
+  text_color: "#E2E8F0"                   # Primary text
+  text_dim_color: "#64748B"               # Secondary/muted text
+  border_color: "#1E293B"                 # Borders and dividers
+  success_color: "#22C55E"                # Confirmed blocks, positive stats
+  warning_color: "#F59E0B"                # Pending states
+  danger_color: "#EF4444"                 # Errors, orphaned blocks
+
+  # Typography
+  font_heading: "Space Grotesk"           # Google Font for headings (h1-h6, nav)
+  font_body: "Inter"                      # Google Font for body text
+
+  # Shape & Effects
+  border_radius: "12px"                   # Corner rounding (0px=sharp, 20px=bubbly)
+  glow_effects: true                      # Neon glow on cards and buttons (gaming look)
+  glow_color: "#8B5CF680"                 # Glow color (use primary + 50% opacity)
+
+
+# ----- Dashboard Pages -----
+# Toggle pages on or off. Disabled pages won't appear in the navigation.
+pages:
+  home: true                              # Landing page with pool overview
+  miners: true                            # Miner lookup (search by wallet)
+  blocks: true                            # Block history
+  payments: true                          # Payment history
+  getting_started: true                   # How-to-connect mining guides
+  goals: true                             # Community goal tracker (Phase 4C)
+  leaderboard: false                      # Top miners — disabled by default (privacy)
+
+
+# ----- Connection Info -----
+# Used on the Getting Started page to generate copy-paste mining commands.
+connection:
+  domain: "pool.example.com"              # Your pool's public domain or IP
+  stratum_port_cpu: 3333                  # Monero stratum port
+  stratum_port_gpu: 3052                  # Ergo stratum port (standard diff)
+  stratum_port_gpu_high: 3152             # Ergo high-diff port (for rigs >1GH/s)
+  region: "US-East"                       # Display label for server region
+  ssl_enabled: false                      # Set to true when you add SSL in Phase 5
+
+
+# ----- Community Goals (Phase 4C) -----
+# Define fundraising/community goals that show progress bars on the dashboard.
+# These are tracked by monitoring wallet balances.
+goals:
+  enabled: true
+  items:
+    - id: "server-costs"
+      title: "Monthly Server Costs"
+      description: "Help keep the pool running!"
+      target_xmr: 0.5
+      wallet_address: "YOUR_GOAL_WALLET_HERE"
+      reset_period: "monthly"             # "monthly", "weekly", or "once"
+      icon: "server"
+
+    - id: "community-event"
+      title: "Gaming Tournament Prize Pool"
+      description: "Mining rewards fund the prizes!"
+      target_xmr: 2.0
+      wallet_address: "YOUR_EVENT_WALLET_HERE"
+      reset_period: "once"
+      icon: "trophy"
+
+
+# ----- Block Celebrations (Phase 4C) -----
+celebrations:
+  enabled: true
+  style: "confetti"                       # "confetti", "fireworks", "flash", "none"
+  sound: false                            # Play a sound effect on block found
+  show_finder: true                       # Display which miner found the block
+
+
+# ----- Discord Integration (Phase 4D) -----
+discord:
+  enabled: false                          # Enable after setting up the bot
+  invite_url: ""                          # Link to join your Discord server
+  server_id: ""
+  channels:
+    block_alerts: ""                      # Channel ID for block notifications
+    stats: ""                             # Channel ID for daily stats
+  roles:
+    active_miner: ""                      # Role assigned when mining
+    block_finder: ""                      # Role assigned on block find
+    top_contributor: ""                   # Role for highest hashrate
+  command_prefix: "!pool"

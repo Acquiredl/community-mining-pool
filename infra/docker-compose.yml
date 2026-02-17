@@ -41,6 +41,7 @@ services:
       --no-zmq
       --out-peers=64
       --in-peers=32
+      --prune-blockchain
 
   # -------------------------------------------------------
   # 3. Database (PostgreSQL)
@@ -129,6 +130,8 @@ services:
     build:
       context: ../frontend           # Points to the frontend/ directory at repo root
       dockerfile: Dockerfile
+    volumes:
+    - ../config/pool-theme:/app/config
     image: community-pool/frontend:latest
     restart: unless-stopped
     ports:
