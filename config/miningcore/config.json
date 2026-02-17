@@ -171,7 +171,12 @@
           "host": "ergo-node",
           "port": 9053,
           "user": "",
-          "password": ""
+          "password": "",
+          "extraConfig": {
+            "timeout": 30000,
+            "maxBlockBacklog": 3,
+            "validateAddresses": false
+          }
         }
       ],
       "paymentProcessing": {

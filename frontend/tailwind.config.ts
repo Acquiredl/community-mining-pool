@@ -5,15 +5,18 @@ export default {
     './layouts/**/*.vue',
     './pages/**/*.vue',
     './composables/**/*.ts',
+    './plugins/**/*.ts',
     './app.vue',
   ],
   theme: {
     extend: {
       // -----------------------------------------------
       // POOL THEME COLORS
-      // These map to CSS custom properties set in app.vue.
-      // In Phase 4B, these will be driven by pool.config.yml.
-      // For now, they're hardcoded to a clean dark theme.
+      // These map to CSS custom properties in app.vue.
+      // The values are overridden at runtime by usePoolConfig()
+      // which reads from pool.config.yml.
+      //
+      // Usage: bg-pool-bg, text-pool-primary, border-pool-border
       // -----------------------------------------------
       colors: {
         pool: {
@@ -27,11 +30,32 @@ export default {
           success: 'var(--pool-success)',
           warning: 'var(--pool-warning)',
           danger: 'var(--pool-danger)',
+          glow: 'var(--pool-glow)',
+          // Coin colors (dynamic, set by usePoolConfig)
+          xmr: 'var(--pool-coin-monero1)',
+          ergo: 'var(--pool-coin-ergo1)',
         },
       },
+      // -----------------------------------------------
+      // TYPOGRAPHY
+      // -----------------------------------------------
       fontFamily: {
-        heading: ['Space Grotesk', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
+        heading: 'var(--pool-font-heading)',
+        body: 'var(--pool-font-body)',
+      },
+      // -----------------------------------------------
+      // BORDER RADIUS
+      // -----------------------------------------------
+      borderRadius: {
+        pool: 'var(--pool-radius)',
+      },
+      // -----------------------------------------------
+      // BOX SHADOW (Glow Effects)
+      // -----------------------------------------------
+      boxShadow: {
+        'pool-glow': '0 0 20px var(--pool-glow), 0 0 60px var(--pool-glow)',
+        'pool-glow-sm': '0 0 10px var(--pool-glow)',
+        'pool-glow-lg': '0 0 30px var(--pool-glow), 0 0 80px var(--pool-glow)',
       },
     },
   },
