@@ -172,6 +172,7 @@
           "port": 9053,
           "user": "",
           "password": "",
+          "apiKey": "ergo_pool_api_key_2026",
           "extraConfig": {
             "timeout": 30000,
             "maxBlockBacklog": 3,
