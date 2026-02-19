@@ -21,6 +21,7 @@ services:
       - monero-node
       - monero-wallet
       - ergo-node
+      - ergo-wallet-unlock
 
   # -------------------------------------------------------
   # 2. Monero Node (The Blockchain)
@@ -55,6 +56,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-change_me_in_env_file}
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ../config/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
   # -------------------------------------------------------
   # 4. Cache (Redis)
@@ -120,6 +122,23 @@ services:
       timeout: 10s
       retries: 10
       start_period: 120s
+
+  # -------------------------------------------------------
+  # 6b. Ergo Wallet Unlocker (one-shot helper)
+  # -------------------------------------------------------
+  # Waits for ergo-node to pass its healthcheck, then unlocks
+  # the wallet so MiningCore can request mining candidates.
+  # Uses restart: on-failure so if the node wasn't ready it retries.
+  ergo-wallet-unlock:
+    image: curlimages/curl:latest
+    restart: on-failure
+    depends_on:
+      ergo-node:
+        condition: service_healthy
+    environment:
+      - ERGO_API_KEY=${ERGO_API_KEY:-ergo_pool_api_key_2026}
+      - ERGO_WALLET_PASS=${ERGO_WALLET_PASS:-ergo_wallet_password}
+    entrypoint: ["/bin/sh", "-c", "curl -sf -X POST http://ergo-node:9053/wallet/unlock -H 'Content-Type: application/json' -H \"api_key: $ERGO_API_KEY\" -d \"{\\\"pass\\\": \\\"$ERGO_WALLET_PASS\\\"}\" && echo 'Wallet unlocked successfully'"]
 
   # -------------------------------------------------------
   # 7. Frontend Dashboard (Nuxt 3) — PHASE 4A NEW
