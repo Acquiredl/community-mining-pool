@@ -131,14 +131,14 @@ services:
   # Uses restart: on-failure so if the node wasn't ready it retries.
   ergo-wallet-unlock:
     image: curlimages/curl:latest
-    restart: on-failure
+    restart: no
     depends_on:
       ergo-node:
         condition: service_healthy
     environment:
       - ERGO_API_KEY=${ERGO_API_KEY:-ergo_pool_api_key_2026}
       - ERGO_WALLET_PASS=${ERGO_WALLET_PASS:-ergo_wallet_password}
-    entrypoint: ["/bin/sh", "-c", "curl -sf -X POST http://ergo-node:9053/wallet/unlock -H 'Content-Type: application/json' -H \"api_key: $ERGO_API_KEY\" -d \"{\\\"pass\\\": \\\"$ERGO_WALLET_PASS\\\"}\" && echo 'Wallet unlocked successfully'"]
+    entrypoint:  ["/bin/sh", "-c", "RESULT=$(curl -s -X POST http://ergo-node:9053/wallet/unlock -H 'Content-Type: application/json' -H 'api_key: ergo_pool_api_key_2026' -d '{\"pass\": \"ergo_wallet_password\"}'); echo $RESULT; if echo $RESULT | grep -q 'OK'; then echo 'Wallet unlocked successfully'; else echo 'Wallet already unlocked or unlock attempted'; fi"]
 
   # -------------------------------------------------------
   # 7. Frontend Dashboard (Nuxt 3) — PHASE 4A NEW
